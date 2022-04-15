@@ -211,7 +211,7 @@ public:
     /**
      * \returns The amount of memory (in bytes) used by the index.
      */
-    int usedMemory() const
+    size_t usedMemory() const
     {
         return nnIndex_->usedMemory();
     }
@@ -421,13 +421,13 @@ private:
  * of the form (branching-1)*K+1 smaller than clusters.rows).
  */
 template <typename Distance>
-int hierarchicalClustering(const Matrix<typename Distance::ElementType>& points, Matrix<typename Distance::ResultType>& centers,
+size_t hierarchicalClustering(const Matrix<typename Distance::ElementType>& points, Matrix<typename Distance::ResultType>& centers,
                            const KMeansIndexParams& params, Distance d = Distance())
 {
     KMeansIndex<Distance> kmeans(points, params, d);
     kmeans.buildIndex();
 
-    int clusterNum = kmeans.getClusterCenters(centers);
+    size_t clusterNum = kmeans.getClusterCenters(centers);
     return clusterNum;
 }
 

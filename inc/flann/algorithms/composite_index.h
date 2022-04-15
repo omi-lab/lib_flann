@@ -149,7 +149,7 @@ public:
     /**
      * \returns The amount of memory (in bytes) used by the index.
      */
-    int usedMemory() const
+    size_t usedMemory() const
     {
         return kmeans_index_->usedMemory() + kdtree_index_->usedMemory();
     }

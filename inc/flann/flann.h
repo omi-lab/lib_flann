@@ -36,45 +36,45 @@
 #ifdef __cplusplus
 extern "C"
 {
-    using namespace flann;
+using namespace flann;
 #endif
 
 
 struct FLANNParameters
 {
-    enum flann_algorithm_t algorithm; /* the algorithm to use */
+  enum flann_algorithm_t algorithm; /* the algorithm to use */
 
-    /* search time parameters */
-    int checks;                /* how many leafs (features) to check in one search */
-    float eps;     /* eps parameter for eps-knn search */
-    int sorted;     /* indicates if results returned by radius search should be sorted or not */
-    int max_neighbors;  /* limits the maximum number of neighbors should be returned by radius search */
-    int cores;      /* number of paralel cores to use for searching */
+  /* search time parameters */
+  int checks;                /* how many leafs (features) to check in one search */
+  float eps;     /* eps parameter for eps-knn search */
+  int sorted;     /* indicates if results returned by radius search should be sorted or not */
+  int max_neighbors;  /* limits the maximum number of neighbors should be returned by radius search */
+  int cores;      /* number of paralel cores to use for searching */
 
-    /*  kdtree index parameters */
-    int trees;                 /* number of randomized trees to use (for kdtree) */
-    int leaf_max_size;
+  /*  kdtree index parameters */
+  int trees;                 /* number of randomized trees to use (for kdtree) */
+  int leaf_max_size;
 
-    /* kmeans index parameters */
-    int branching;             /* branching factor (for kmeans tree) */
-    int iterations;            /* max iterations to perform in one kmeans cluetering (kmeans tree) */
-    enum flann_centers_init_t centers_init;  /* algorithm used for picking the initial cluster centers for kmeans tree */
-    float cb_index;            /* cluster boundary index. Used when searching the kmeans tree */
+  /* kmeans index parameters */
+  int branching;             /* branching factor (for kmeans tree) */
+  int iterations;            /* max iterations to perform in one kmeans cluetering (kmeans tree) */
+  enum flann_centers_init_t centers_init;  /* algorithm used for picking the initial cluster centers for kmeans tree */
+  float cb_index;            /* cluster boundary index. Used when searching the kmeans tree */
 
-    /* autotuned index parameters */
-    float target_precision;    /* precision desired (used for autotuning, -1 otherwise) */
-    float build_weight;        /* build tree time weighting factor */
-    float memory_weight;       /* index memory weigthing factor */
-    float sample_fraction;     /* what fraction of the dataset to use for autotuning */
+  /* autotuned index parameters */
+  float target_precision;    /* precision desired (used for autotuning, -1 otherwise) */
+  float build_weight;        /* build tree time weighting factor */
+  float memory_weight;       /* index memory weigthing factor */
+  float sample_fraction;     /* what fraction of the dataset to use for autotuning */
 
-    /* LSH parameters */
-    unsigned int table_number_; /** The number of hash tables to use */
-    unsigned int key_size_;     /** The length of the key in the hash tables */
-    unsigned int multi_probe_level_; /** Number of levels to use in multi-probe LSH, 0 for standard LSH */
+  /* LSH parameters */
+  size_t table_number_; /** The number of hash tables to use */
+  size_t key_size_;     /** The length of the key in the hash tables */
+  size_t multi_probe_level_; /** Number of levels to use in multi-probe LSH, 0 for standard LSH */
 
-    /* other parameters */
-    enum flann_log_level_t log_level;    /* determines the verbosity of each flann function */
-    long random_seed;            /* random seed to use */
+  /* other parameters */
+  enum flann_log_level_t log_level;    /* determines the verbosity of each flann function */
+  long random_seed;            /* random seed to use */
 };
 
 
@@ -196,19 +196,19 @@ FLANN_EXPORT int flann_add_points_int(flann_index_t index_ptr, int* points,
  * point_id = index of datapoint to remove.
 */
 FLANN_EXPORT int flann_remove_point(flann_index_t index_ptr,
-                                    unsigned int point_id);
+                                    size_t point_id);
 
 FLANN_EXPORT int flann_remove_point_float(flann_index_t index_ptr,
-                                          unsigned int point_id);
+                                          size_t point_id);
 
 FLANN_EXPORT int flann_remove_point_double(flann_index_t index_ptr,
-                                           unsigned int point_id);
+                                           size_t point_id);
 
 FLANN_EXPORT int flann_remove_point_byte(flann_index_t index_ptr,
-                                         unsigned int point_id);
+                                         size_t point_id);
 
 FLANN_EXPORT int flann_remove_point_int(flann_index_t index_ptr,
-                                        unsigned int point_id);
+                                        size_t point_id);
 
 /**
  * Gets a point from a given index position.
@@ -219,19 +219,19 @@ FLANN_EXPORT int flann_remove_point_int(flann_index_t index_ptr,
  * Returns: pointer to datapoint or NULL on miss
 */
 FLANN_EXPORT float* flann_get_point(flann_index_t index_ptr,
-                                    unsigned int point_id);
+                                    size_t point_id);
 
 FLANN_EXPORT float* flann_get_point_float(flann_index_t index_ptr,
-                                          unsigned int point_id);
+                                          size_t point_id);
 
 FLANN_EXPORT double* flann_get_point_double(flann_index_t index_ptr,
-                                            unsigned int point_id);
+                                            size_t point_id);
 
 FLANN_EXPORT unsigned char* flann_get_point_byte(flann_index_t index_ptr,
-                                                 unsigned int point_id);
+                                                 size_t point_id);
 
 FLANN_EXPORT int* flann_get_point_int(flann_index_t index_ptr,
-                                      unsigned int point_id);
+                                      size_t point_id);
 
 /**
  * Returns the number of datapoints stored in index.
@@ -239,15 +239,15 @@ FLANN_EXPORT int* flann_get_point_int(flann_index_t index_ptr,
  * index_ptr = pointer to pre-built index.
  *
 */
-FLANN_EXPORT unsigned int flann_veclen(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_veclen(flann_index_t index_ptr);
 
-FLANN_EXPORT unsigned int flann_veclen_float(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_veclen_float(flann_index_t index_ptr);
 
-FLANN_EXPORT unsigned int flann_veclen_double(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_veclen_double(flann_index_t index_ptr);
 
-FLANN_EXPORT unsigned int flann_veclen_byte(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_veclen_byte(flann_index_t index_ptr);
 
-FLANN_EXPORT unsigned int flann_veclen_int(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_veclen_int(flann_index_t index_ptr);
 
 /**
  * Returns the dimensionality of datapoints stored in index.
@@ -255,15 +255,15 @@ FLANN_EXPORT unsigned int flann_veclen_int(flann_index_t index_ptr);
  * index_ptr = pointer to pre-built index.
  *
 */
-FLANN_EXPORT unsigned int flann_size(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_size(flann_index_t index_ptr);
 
-FLANN_EXPORT unsigned int flann_size_float(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_size_float(flann_index_t index_ptr);
 
-FLANN_EXPORT unsigned int flann_size_double(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_size_double(flann_index_t index_ptr);
 
-FLANN_EXPORT unsigned int flann_size_byte(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_size_byte(flann_index_t index_ptr);
 
-FLANN_EXPORT unsigned int flann_size_int(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_size_int(flann_index_t index_ptr);
 
 /**
  * Returns the number of bytes consumed by the index.
@@ -271,15 +271,15 @@ FLANN_EXPORT unsigned int flann_size_int(flann_index_t index_ptr);
  * index_ptr = pointer to pre-built index.
  *
 */
-FLANN_EXPORT int flann_used_memory(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_used_memory(flann_index_t index_ptr);
 
-FLANN_EXPORT int flann_used_memory_float(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_used_memory_float(flann_index_t index_ptr);
 
-FLANN_EXPORT int flann_used_memory_double(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_used_memory_double(flann_index_t index_ptr);
 
-FLANN_EXPORT int flann_used_memory_byte(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_used_memory_byte(flann_index_t index_ptr);
 
-FLANN_EXPORT int flann_used_memory_int(flann_index_t index_ptr);
+FLANN_EXPORT size_t flann_used_memory_int(flann_index_t index_ptr);
 
 
 /**
@@ -289,20 +289,20 @@ FLANN_EXPORT int flann_used_memory_int(flann_index_t index_ptr);
  * @param filename The filename the index should be saved to
  * @return Returns 0 on success, negative value on error.
  */
-FLANN_EXPORT int flann_save_index(flann_index_t index_id,
-                                  char* filename);
+FLANN_EXPORT size_t flann_save_index(flann_index_t index_id,
+                                     char* filename);
 
-FLANN_EXPORT int flann_save_index_float(flann_index_t index_id,
-                                        char* filename);
+FLANN_EXPORT size_t flann_save_index_float(flann_index_t index_id,
+                                           char* filename);
 
-FLANN_EXPORT int flann_save_index_double(flann_index_t index_id,
+FLANN_EXPORT size_t flann_save_index_double(flann_index_t index_id,
+                                            char* filename);
+
+FLANN_EXPORT size_t flann_save_index_byte(flann_index_t index_id,
+                                          char* filename);
+
+FLANN_EXPORT size_t flann_save_index_int(flann_index_t index_id,
                                          char* filename);
-
-FLANN_EXPORT int flann_save_index_byte(flann_index_t index_id,
-                                       char* filename);
-
-FLANN_EXPORT int flann_save_index_int(flann_index_t index_id,
-                                      char* filename);
 
 /**
  * Loads an index from a file.
@@ -355,7 +355,7 @@ FLANN_EXPORT flann_index_t flann_load_index_int(char* filename,
 
    Returns: zero or -1 for error
  */
-FLANN_EXPORT int flann_find_nearest_neighbors(float* dataset,
+FLANN_EXPORT size_t flann_find_nearest_neighbors(float* dataset,
                                               int rows,
                                               int cols,
                                               float* testset,
@@ -365,7 +365,7 @@ FLANN_EXPORT int flann_find_nearest_neighbors(float* dataset,
                                               int nn,
                                               struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_find_nearest_neighbors_float(float* dataset,
+FLANN_EXPORT size_t flann_find_nearest_neighbors_float(float* dataset,
                                                     int rows,
                                                     int cols,
                                                     float* testset,
@@ -375,7 +375,7 @@ FLANN_EXPORT int flann_find_nearest_neighbors_float(float* dataset,
                                                     int nn,
                                                     struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_find_nearest_neighbors_double(double* dataset,
+FLANN_EXPORT size_t flann_find_nearest_neighbors_double(double* dataset,
                                                      int rows,
                                                      int cols,
                                                      double* testset,
@@ -385,7 +385,7 @@ FLANN_EXPORT int flann_find_nearest_neighbors_double(double* dataset,
                                                      int nn,
                                                      struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_find_nearest_neighbors_byte(unsigned char* dataset,
+FLANN_EXPORT size_t flann_find_nearest_neighbors_byte(unsigned char* dataset,
                                                    int rows,
                                                    int cols,
                                                    unsigned char* testset,
@@ -395,7 +395,7 @@ FLANN_EXPORT int flann_find_nearest_neighbors_byte(unsigned char* dataset,
                                                    int nn,
                                                    struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_find_nearest_neighbors_int(int* dataset,
+FLANN_EXPORT size_t flann_find_nearest_neighbors_int(int* dataset,
                                                   int rows,
                                                   int cols,
                                                   int* testset,
@@ -422,7 +422,7 @@ FLANN_EXPORT int flann_find_nearest_neighbors_int(int* dataset,
 
    Returns: zero or a number <0 for error
  */
-FLANN_EXPORT int flann_find_nearest_neighbors_index(flann_index_t index_id,
+FLANN_EXPORT size_t flann_find_nearest_neighbors_index(flann_index_t index_id,
                                                     float* testset,
                                                     int trows,
                                                     int* indices,
@@ -430,7 +430,7 @@ FLANN_EXPORT int flann_find_nearest_neighbors_index(flann_index_t index_id,
                                                     int nn,
                                                     struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_find_nearest_neighbors_index_float(flann_index_t index_id,
+FLANN_EXPORT size_t flann_find_nearest_neighbors_index_float(flann_index_t index_id,
                                                           float* testset,
                                                           int trows,
                                                           int* indices,
@@ -438,7 +438,7 @@ FLANN_EXPORT int flann_find_nearest_neighbors_index_float(flann_index_t index_id
                                                           int nn,
                                                           struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_find_nearest_neighbors_index_double(flann_index_t index_id,
+FLANN_EXPORT size_t flann_find_nearest_neighbors_index_double(flann_index_t index_id,
                                                            double* testset,
                                                            int trows,
                                                            int* indices,
@@ -446,7 +446,7 @@ FLANN_EXPORT int flann_find_nearest_neighbors_index_double(flann_index_t index_i
                                                            int nn,
                                                            struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_find_nearest_neighbors_index_byte(flann_index_t index_id,
+FLANN_EXPORT size_t flann_find_nearest_neighbors_index_byte(flann_index_t index_id,
                                                          unsigned char* testset,
                                                          int trows,
                                                          int* indices,
@@ -454,7 +454,7 @@ FLANN_EXPORT int flann_find_nearest_neighbors_index_byte(flann_index_t index_id,
                                                          int nn,
                                                          struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_find_nearest_neighbors_index_int(flann_index_t index_id,
+FLANN_EXPORT size_t flann_find_nearest_neighbors_index_int(flann_index_t index_id,
                                                         int* testset,
                                                         int trows,
                                                         int* indices,
@@ -477,7 +477,7 @@ FLANN_EXPORT int flann_find_nearest_neighbors_index_int(flann_index_t index_id,
  * a higher search speedup at the cost of potentially not returning all the
  * neighbours in the specified radius.
  */
-FLANN_EXPORT int flann_radius_search(flann_index_t index_ptr, /* the index */
+FLANN_EXPORT size_t flann_radius_search(flann_index_t index_ptr, /* the index */
                                      float* query, /* query point */
                                      int* indices, /* array for storing the indices found (will be modified) */
                                      float* dists, /* similar, but for storing distances */
@@ -485,7 +485,7 @@ FLANN_EXPORT int flann_radius_search(flann_index_t index_ptr, /* the index */
                                      float radius, /* search radius (squared radius for euclidian metric) */
                                      struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_radius_search_float(flann_index_t index_ptr, /* the index */
+FLANN_EXPORT size_t flann_radius_search_float(flann_index_t index_ptr, /* the index */
                                            float* query, /* query point */
                                            int* indices, /* array for storing the indices found (will be modified) */
                                            float* dists, /* similar, but for storing distances */
@@ -493,7 +493,7 @@ FLANN_EXPORT int flann_radius_search_float(flann_index_t index_ptr, /* the index
                                            float radius, /* search radius (squared radius for euclidian metric) */
                                            struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_radius_search_double(flann_index_t index_ptr, /* the index */
+FLANN_EXPORT size_t flann_radius_search_double(flann_index_t index_ptr, /* the index */
                                             double* query, /* query point */
                                             int* indices, /* array for storing the indices found (will be modified) */
                                             double* dists, /* similar, but for storing distances */
@@ -501,7 +501,7 @@ FLANN_EXPORT int flann_radius_search_double(flann_index_t index_ptr, /* the inde
                                             float radius, /* search radius (squared radius for euclidian metric) */
                                             struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_radius_search_byte(flann_index_t index_ptr, /* the index */
+FLANN_EXPORT size_t flann_radius_search_byte(flann_index_t index_ptr, /* the index */
                                           unsigned char* query, /* query point */
                                           int* indices, /* array for storing the indices found (will be modified) */
                                           float* dists, /* similar, but for storing distances */
@@ -509,7 +509,7 @@ FLANN_EXPORT int flann_radius_search_byte(flann_index_t index_ptr, /* the index 
                                           float radius, /* search radius (squared radius for euclidian metric) */
                                           struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_radius_search_int(flann_index_t index_ptr, /* the index */
+FLANN_EXPORT size_t flann_radius_search_int(flann_index_t index_ptr, /* the index */
                                          int* query, /* query point */
                                          int* indices, /* array for storing the indices found (will be modified) */
                                          float* dists, /* similar, but for storing distances */
@@ -526,19 +526,19 @@ FLANN_EXPORT int flann_radius_search_int(flann_index_t index_ptr, /* the index *
 
    Returns: zero or a number <0 for error
  */
-FLANN_EXPORT int flann_free_index(flann_index_t index_id,
+FLANN_EXPORT size_t flann_free_index(flann_index_t index_id,
                                   struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_free_index_float(flann_index_t index_id,
+FLANN_EXPORT size_t flann_free_index_float(flann_index_t index_id,
                                         struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_free_index_double(flann_index_t index_id,
+FLANN_EXPORT size_t flann_free_index_double(flann_index_t index_id,
                                          struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_free_index_byte(flann_index_t index_id,
+FLANN_EXPORT size_t flann_free_index_byte(flann_index_t index_id,
                                        struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_free_index_int(flann_index_t index_id,
+FLANN_EXPORT size_t flann_free_index_int(flann_index_t index_id,
                                       struct FLANNParameters* flann_params);
 
 /**
@@ -560,35 +560,35 @@ FLANN_EXPORT int flann_free_index_int(flann_index_t index_id,
     (branch_size-1)*K+1 smaller than the number of clusters requested.
  */
 
-FLANN_EXPORT int flann_compute_cluster_centers(float* dataset,
+FLANN_EXPORT size_t flann_compute_cluster_centers(float* dataset,
                                                int rows,
                                                int cols,
                                                int clusters,
                                                float* result,
                                                struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_compute_cluster_centers_float(float* dataset,
+FLANN_EXPORT size_t flann_compute_cluster_centers_float(float* dataset,
                                                      int rows,
                                                      int cols,
                                                      int clusters,
                                                      float* result,
                                                      struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_compute_cluster_centers_double(double* dataset,
+FLANN_EXPORT size_t flann_compute_cluster_centers_double(double* dataset,
                                                       int rows,
                                                       int cols,
                                                       int clusters,
                                                       double* result,
                                                       struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_compute_cluster_centers_byte(unsigned char* dataset,
+FLANN_EXPORT size_t flann_compute_cluster_centers_byte(unsigned char* dataset,
                                                     int rows,
                                                     int cols,
                                                     int clusters,
                                                     float* result,
                                                     struct FLANNParameters* flann_params);
 
-FLANN_EXPORT int flann_compute_cluster_centers_int(int* dataset,
+FLANN_EXPORT size_t flann_compute_cluster_centers_int(int* dataset,
                                                    int rows,
                                                    int cols,
                                                    int clusters,

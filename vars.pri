@@ -2,6 +2,7 @@ TARGET = lib_flann
 TEMPLATE = lib
 
 DEFINES += LIB_FLANN
+DEFINES += FLANN_EXPORTS
 
 SOURCES += src/flann.cpp
 SOURCES += src/flann_cpp.cpp
@@ -50,7 +51,7 @@ HEADERS += inc/flann/util/timer.h
 HEADERS += inc/flann/util/cuda/heap.h
 HEADERS += inc/flann/util/cuda/result_set.h
 
-HEADERS += inc/flann/nn/ground_truth.h
-HEADERS += inc/flann/nn/index_testing.h
-HEADERS += inc/flann/nn/simplex_downhill.h
+#HEADERS += inc/flann/nn/ground_truth.h
+#HEADERS += inc/flann/nn/index_testing.h
+#HEADERS += inc/flann/nn/simplex_downhill.h
 

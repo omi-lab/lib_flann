@@ -40,7 +40,7 @@
 #include "flann/algorithms/linear_index.h"
 #include "flann/algorithms/hierarchical_clustering_index.h"
 #include "flann/algorithms/lsh_index.h"
-#include "flann/algorithms/autotuned_index.h"
+//#include "flann/algorithms/autotuned_index.h"
 #ifdef FLANN_USE_CUDA
 #include "flann/algorithms/kdtree_cuda_3d_index.h"
 #endif
@@ -97,13 +97,13 @@ struct DummyDistance
     typedef float ResultType;
 
     template <typename Iterator1, typename Iterator2>
-    ResultType operator()(Iterator1 a, Iterator2 b, size_t size, ResultType /*worst_dist*/ = -1) const
+    ResultType operator()(Iterator1 /*a*/, Iterator2 /*b*/, size_t /*size*/, ResultType /*worst_dist*/ = -1) const
     {
         return ResultType(0);
     }
 
     template <typename U, typename V>
-    inline ResultType accum_dist(const U& a, const V& b, int) const
+    inline ResultType accum_dist(const U& /*a*/, const V& /*b*/, size_t) const
     {
         return ResultType(0);
     }
@@ -133,7 +133,7 @@ inline NNIndex<Distance>* create_index_(flann::Matrix<T> data, const flann::Inde
 }
 
 template <template<typename> class Index, typename Distance, typename T>
-inline NNIndex<Distance>* create_index_(flann::Matrix<T> data, const flann::IndexParams& params, const Distance& distance,
+inline NNIndex<Distance>* create_index_(flann::Matrix<T> /*data*/, const flann::IndexParams& /*params*/, const Distance& /*distance*/,
 		typename disable_if<valid_combination<Index,Distance,T>::value,void>::type* = 0)
 {
     return NULL;
@@ -173,9 +173,9 @@ inline NNIndex<Distance>*
 	case FLANN_INDEX_COMPOSITE:
 		nnIndex = create_index_<CompositeIndex,Distance,ElementType>(dataset, params, distance);
 		break;
-	case FLANN_INDEX_AUTOTUNED:
-		nnIndex = create_index_<AutotunedIndex,Distance,ElementType>(dataset, params, distance);
-		break;
+//	case FLANN_INDEX_AUTOTUNED:
+//		nnIndex = create_index_<AutotunedIndex,Distance,ElementType>(dataset, params, distance);
+//		break;
 	case FLANN_INDEX_HIERARCHICAL:
 		nnIndex = create_index_<HierarchicalClusteringIndex,Distance,ElementType>(dataset, params, distance);
 		break;

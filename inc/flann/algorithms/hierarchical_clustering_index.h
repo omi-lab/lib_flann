@@ -199,7 +199,7 @@ public:
      * Computes the inde memory usage
      * Returns: memory used by the index
      */
-    int usedMemory() const
+    size_t usedMemory() const
     {
         return pool_.usedMemory+pool_.wastedMemory+memoryCounter_;
     }
@@ -310,13 +310,13 @@ protected:
             throw FLANNException("Branching factor must be at least 2");
         }
         tree_roots_.resize(trees_);
-        std::vector<int> indices(size_);
-        for (int i=0; i<trees_; ++i) {
+        std::vector<size_t> indices(size_);
+        for (size_t i=0; i<trees_; ++i) {
             for (size_t j=0; j<size_; ++j) {
                 indices[j] = j;
             }
             tree_roots_[i] = new(pool_) Node();
-            computeClustering(tree_roots_[i], &indices[0], size_);
+            computeClustering(tree_roots_[i], &indices[0], int(size_));
         }
     }
 
@@ -459,14 +459,14 @@ private:
 
 
 
-    void computeLabels(int* indices, int indices_length,  int* centers, int centers_length, int* labels, DistanceType& cost)
+    void computeLabels(size_t* indices, size_t indices_length,  size_t* centers, size_t centers_length, size_t* labels, DistanceType& cost)
     {
         cost = 0;
-        for (int i=0; i<indices_length; ++i) {
+        for (size_t i=0; i<indices_length; ++i) {
             ElementType* point = points_[indices[i]];
             DistanceType dist = distance_(point, points_[centers[0]], veclen_);
             labels[i] = 0;
-            for (int j=1; j<centers_length; ++j) {
+            for (size_t j=1; j<centers_length; ++j) {
                 DistanceType new_dist = distance_(point, points_[centers[j]], veclen_);
                 if (dist>new_dist) {
                     labels[i] = j;
@@ -487,11 +487,11 @@ private:
      *     branching = the branching factor to use in the clustering
      *
      */
-    void computeClustering(NodePtr node, int* indices, int indices_length)
+    void computeClustering(NodePtr node, size_t* indices, size_t indices_length)
     {
         if (indices_length < leaf_max_size_) { // leaf node
             node->points.resize(indices_length);
-            for (int i=0;i<indices_length;++i) {
+            for (size_t i=0;i<indices_length;++i) {
             	node->points[i].index = indices[i];
             	node->points[i].point = points_[indices[i]];
             }
@@ -499,15 +499,15 @@ private:
             return;
         }
 
-        std::vector<int> centers(branching_);
-        std::vector<int> labels(indices_length);
+        std::vector<size_t> centers(branching_);
+        std::vector<size_t> labels(indices_length);
 
-        int centers_length;
+        size_t centers_length;
         (*chooseCenters_)(branching_, indices, indices_length, &centers[0], centers_length);
 
         if (centers_length<branching_) {
             node->points.resize(indices_length);
-            for (int i=0;i<indices_length;++i) {
+            for (size_t i=0;i<indices_length;++i) {
             	node->points[i].index = indices[i];
             	node->points[i].point = points_[indices[i]];
             }
@@ -523,8 +523,8 @@ private:
         node->childs.resize(branching_);
         int start = 0;
         int end = start;
-        for (int i=0; i<branching_; ++i) {
-            for (int j=0; j<indices_length; ++j) {
+        for (size_t i=0; i<branching_; ++i) {
+            for (size_t j=0; j<indices_length; ++j) {
                 if (labels[j]==i) {
                     std::swap(indices[j],indices[end]);
                     std::swap(labels[j],labels[end]);
@@ -630,7 +630,7 @@ private:
             node->points.push_back(pointInfo);
 
             if (node->points.size()>=size_t(branching_)) {
-                std::vector<int> indices(node->points.size());
+                std::vector<size_t> indices(node->points.size());
 
                 for (size_t i=0;i<node->points.size();++i) {
                 	indices[i] = node->points[i].index;
@@ -640,7 +640,7 @@ private:
         }
         else {            
             // find the closest child
-            int closest = 0;
+            size_t closest = 0;
             ElementType* center = node->childs[closest]->pivot;
             DistanceType dist = distance_(center, point, veclen_);
             for (size_t i=1;i<size_t(branching_);++i) {
@@ -688,18 +688,18 @@ private:
     /**
      * Memory occupied by the index.
      */
-    int memoryCounter_;
+    size_t memoryCounter_;
 
     /** index parameters */
     /**
      * Branching factor to use for clustering
      */
-    int branching_;
+    size_t branching_;
     
     /**
      * How many parallel trees to build
      */
-    int trees_;
+    size_t trees_;
     
     /**
      * Algorithm to use for choosing cluster centers

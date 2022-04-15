@@ -92,7 +92,7 @@ public:
      * @param centers indices of chosen centers
      * @param centers_length length of centers array
      */
-	virtual void operator()(int k, int* indices, int indices_length, int* centers, int& centers_length) = 0;
+  virtual void operator()(size_t k, size_t* indices, size_t indices_length, size_t* centers, size_t& centers_length) = 0;
 
 protected:
 	const Distance distance_;
@@ -114,14 +114,14 @@ public:
     RandomCenterChooser(const Distance& distance, const std::vector<ElementType*>& points) :
     	CenterChooser<Distance>(distance, points) {}
 
-    void operator()(int k, int* indices, int indices_length, int* centers, int& centers_length)
+    void operator()(size_t k, size_t* indices, size_t indices_length, size_t* centers, size_t& centers_length)
     {
         UniqueRandom r(indices_length);
 
-        int index;
+        size_t index;
         for (index=0; index<k; ++index) {
             bool duplicate = true;
-            int rnd;
+            size_t rnd;
             while (duplicate) {
                 duplicate = false;
                 rnd = r.next();
@@ -132,7 +132,7 @@ public:
 
                 centers[index] = indices[rnd];
 
-                for (int j=0; j<index; ++j) {
+                for (size_t j=0; j<index; ++j) {
                     DistanceType sq = distance_(points_[centers[index]], points_[centers[j]], cols_);
                     if (sq<1e-16) {
                         duplicate = true;
@@ -164,16 +164,16 @@ public:
     GonzalesCenterChooser(const Distance& distance, const std::vector<ElementType*>& points) : 
         CenterChooser<Distance>(distance, points) {}
 
-    void operator()(int k, int* indices, int indices_length, int* centers, int& centers_length)
+    void operator()(size_t k, size_t* indices, size_t indices_length, size_t* centers, size_t& centers_length)
     {
-        int n = indices_length;
+        size_t n = indices_length;
 
-        int rnd = rand_int(n);
+        size_t rnd = rand_int(n);
         assert(rnd >=0 && rnd < n);
 
         centers[0] = indices[rnd];
 
-        int index;
+        size_t index;
         for (index=1; index<k; ++index) {
 
             int best_index = -1;
@@ -221,15 +221,15 @@ public:
     KMeansppCenterChooser(const Distance& distance, const std::vector<ElementType*>& points) : 
         CenterChooser<Distance>(distance, points) {}
 
-    void operator()(int k, int* indices, int indices_length, int* centers, int& centers_length)
+    void operator()(size_t k, size_t* indices, size_t indices_length, size_t* centers, size_t& centers_length)
     {
-        int n = indices_length;
+        size_t n = indices_length;
 
         double currentPot = 0;
         DistanceType* closestDistSq = new DistanceType[n];
 
         // Choose one random center and set the closestDistSq values
-        int index = rand_int(n);
+        size_t index = rand_int(n);
         assert(index >=0 && index < n);
         centers[0] = indices[index];
 
@@ -250,8 +250,8 @@ public:
 
             // Repeat several trials
             double bestNewPot = -1;
-            int bestNewIndex = 0;
-            for (int localTrial = 0; localTrial < numLocalTries; localTrial++) {
+            size_t bestNewIndex = 0;
+            for (size_t localTrial = 0; localTrial < numLocalTries; localTrial++) {
 
                 // Choose our center - have to be slightly careful to return a valid answer even accounting
                 // for possible rounding errors
@@ -263,7 +263,7 @@ public:
 
                 // Compute the new potential
                 double newPot = 0;
-                for (int i = 0; i < n; i++) {
+                for (size_t i = 0; i < n; i++) {
                     DistanceType dist = distance_(points_[indices[i]], points_[indices[index]], cols_);
                     newPot += std::min( ensureSquareDistance<Distance>(dist), closestDistSq[i] );
                 }
@@ -278,7 +278,7 @@ public:
             // Add the appropriate center
             centers[centerCount] = indices[bestNewIndex];
             currentPot = bestNewPot;
-            for (int i = 0; i < n; i++) {
+            for (size_t i = 0; i < n; i++) {
                 DistanceType dist = distance_(points_[indices[i]], points_[indices[bestNewIndex]], cols_);
                 closestDistSq[i] = std::min( ensureSquareDistance<Distance>(dist), closestDistSq[i] );
             }
@@ -317,31 +317,31 @@ public:
     GroupWiseCenterChooser(const Distance& distance, const std::vector<ElementType*>& points) :
         CenterChooser<Distance>(distance, points) {}
 
-    void operator()(int k, int* indices, int indices_length, int* centers, int& centers_length)
+    void operator()(size_t k, size_t* indices, size_t indices_length, size_t* centers, size_t& centers_length)
     {
         const float kSpeedUpFactor = 1.3f;
 
-        int n = indices_length;
+        size_t n = indices_length;
 
         DistanceType* closestDistSq = new DistanceType[n];
 
         // Choose one random center and set the closestDistSq values
-        int index = rand_int(n);
+        size_t index = rand_int(n);
         assert(index >=0 && index < n);
         centers[0] = indices[index];
 
-        for (int i = 0; i < n; i++) {
+        for (size_t i = 0; i < n; i++) {
             closestDistSq[i] = distance_(points_[indices[i]], points_[indices[index]], cols_);
         }
 
 
         // Choose each center
-        int centerCount;
+        size_t centerCount;
         for (centerCount = 1; centerCount < k; centerCount++) {
 
             // Repeat several trials
             double bestNewPot = -1;
-            int bestNewIndex = 0;
+            size_t bestNewIndex = 0;
             DistanceType furthest = 0;
             for (index = 0; index < n; index++) {
 

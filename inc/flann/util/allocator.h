@@ -194,12 +194,12 @@ public:
 
 }
 
-inline void* operator new (std::size_t size, flann::PooledAllocator& allocator)
+inline void* operator new (size_t size, flann::PooledAllocator& allocator)
 {
-    return allocator.allocateMemory(size) ;
+    return allocator.allocateMemory(int(size));
 }
 
-inline void operator delete(void* p, flann::PooledAllocator& allocator)
+inline void operator delete(void* /*p*/, flann::PooledAllocator& /*allocator*/)
 {
 }
 

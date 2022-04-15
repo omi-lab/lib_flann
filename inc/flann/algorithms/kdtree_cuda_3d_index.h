@@ -176,7 +176,7 @@ public:
      * Returns: memory used by the index
      * TODO: return system or gpu RAM or both?
      */
-    int usedMemory() const
+    size_t usedMemory() const
     {
         //         return tree_.size()*sizeof(Node)+dataset_.rows*sizeof(int);  // pool memory and vind array memory
         return 0;

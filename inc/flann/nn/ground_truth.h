@@ -44,7 +44,7 @@ void find_nearest(const Matrix<typename Distance::ElementType>& dataset, typenam
 {
     //typedef typename Distance::ElementType ElementType;
     typedef typename Distance::ResultType DistanceType;
-    int n = nn + skip;
+    size_t n = nn + skip;
 
     int* match = new int[n];
     DistanceType* dists = new DistanceType[n];

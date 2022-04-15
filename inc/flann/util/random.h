@@ -48,7 +48,7 @@ namespace flann
  */
 inline void seed_random(unsigned int seed)
 {
-    srand(seed);
+  srand(seed);
 }
 
 /**
@@ -68,9 +68,9 @@ inline double rand_double(double high = 1.0, double low = 0)
  * @param low Lower limit
  * @return Random integer value
  */
-inline int rand_int(int high = RAND_MAX, int low = 0)
+inline size_t rand_int(size_t high = RAND_MAX, size_t low = 0)
 {
-  return low + (int)(double(high - low) * (std::rand() / (RAND_MAX + 1.0)));
+  return low + size_t(double(high - low) * (std::rand() / (RAND_MAX + 1.0)));
 }
 
 
@@ -80,53 +80,53 @@ inline int rand_int(int high = RAND_MAX, int low = 0)
  */
 class UniqueRandom
 {
-    std::vector<int> vals_;
-    int size_;
-    int counter_;
+  std::vector<size_t> vals_;
+  size_t size_;
+  size_t counter_;
 
 public:
-    /**
+  /**
      * Constructor.
      * @param n Size of the interval from which to generate
      * @return
      */
-    UniqueRandom(int n)
-    {
-        init(n);
-    }
+  UniqueRandom(size_t n)
+  {
+    init(n);
+  }
 
-    /**
+  /**
      * Initializes the number generator.
      * @param n the size of the interval from which to generate random numbers.
      */
-    void init(int n)
-    {
-        // create and initialize an array of size n
-        vals_.resize(n);
-        size_ = n;
-        for (int i = 0; i < size_; ++i) vals_[i] = i;
+  void init(size_t n)
+  {
+    // create and initialize an array of size n
+    vals_.resize(n);
+    size_ = n;
+    for (size_t i = 0; i < size_; ++i) vals_[i] = i;
 
-        std::random_device rd;
-        std::mt19937 g(rd());
-        std::shuffle(vals_.begin(), vals_.end(), g);
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(vals_.begin(), vals_.end(), g);
 
-        counter_ = 0;
-    }
+    counter_ = 0;
+  }
 
-    /**
+  /**
      * Return a distinct random integer in greater or equal to 0 and less
      * than 'n' on each call. It should be called maximum 'n' times.
      * Returns: a random integer
      */
-    int next()
-    {
-        if (counter_ == size_) {
-            return -1;
-        }
-        else {
-            return vals_[counter_++];
-        }
+  size_t next()
+  {
+    if (counter_ == size_) {
+      return 0;
     }
+    else {
+      return vals_[counter_++];
+    }
+  }
 };
 
 }

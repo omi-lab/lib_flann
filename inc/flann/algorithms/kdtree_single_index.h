@@ -140,7 +140,7 @@ public:
 
     using BaseClass::buildIndex;
 
-    void addPoints(const Matrix<ElementType>& points, float rebuild_threshold = 2)
+    void addPoints(const Matrix<ElementType>& points, float /*rebuild_threshold = 2*/)
     {
         assert(points.cols==veclen_);
         extendDataset(points);
@@ -203,7 +203,7 @@ public:
      * Computes the inde memory usage
      * Returns: memory used by the index
      */
-    int usedMemory() const
+    size_t usedMemory() const
     {
         return pool_.usedMemory+pool_.wastedMemory+size_*sizeof(int);  // pool memory and vind array memory
     }
@@ -241,11 +241,11 @@ protected:
         // Create a permutable array of indices to the input vectors.
         vind_.resize(size_);
         for (size_t i = 0; i < size_; i++) {
-            vind_[i] = i;
+            vind_[i] = int(i);
         }
 
         computeBoundingBox(root_bbox_);
-        root_node_ = divideTree(0, size_, root_bbox_ );   // construct the tree
+        root_node_ = divideTree(0, int(size_), root_bbox_ );   // construct the tree
 
         if (reorder_) {
             data_ = flann::Matrix<ElementType>(new ElementType[size_*veclen_], size_, veclen_);
@@ -264,11 +264,11 @@ private:
     	/**
     	 * Indices of points in leaf node
     	 */
-    	int left, right;
+      size_t left, right;
     	/**
     	 * Dimension used for subdivision.
     	 */
-    	int divfeat;
+      size_t divfeat;
     	/**
     	 * The values used for subdivision.
     	 */
@@ -385,7 +385,7 @@ private:
      *                  first = index of the first vector
      *                  last = index of the last vector
      */
-    NodePtr divideTree(int left, int right, BoundingBox& bbox)
+    NodePtr divideTree(size_t left, size_t right, BoundingBox& bbox)
     {
         NodePtr node = new (pool_) Node(); // allocate memory
 
@@ -400,7 +400,7 @@ private:
                 bbox[i].low = (DistanceType)points_[vind_[left]][i];
                 bbox[i].high = (DistanceType)points_[vind_[left]][i];
             }
-            for (int k=left+1; k<right; ++k) {
+            for (size_t k=left+1; k<right; ++k) {
                 for (size_t i=0; i<veclen_; ++i) {
                     if (bbox[i].low>points_[vind_[k]][i]) bbox[i].low=(DistanceType)points_[vind_[k]][i];
                     if (bbox[i].high<points_[vind_[k]][i]) bbox[i].high=(DistanceType)points_[vind_[k]][i];
@@ -408,8 +408,8 @@ private:
             }
         }
         else {
-            int idx;
-            int cutfeat;
+            size_t idx;
+            size_t cutfeat;
             DistanceType cutval;
             middleSplit(&vind_[0]+left, right-left, idx, cutfeat, cutval, bbox);
 
@@ -435,25 +435,25 @@ private:
         return node;
     }
 
-    void computeMinMax(int* ind, int count, int dim, ElementType& min_elem, ElementType& max_elem)
+    void computeMinMax(size_t* ind, size_t count, size_t dim, ElementType& min_elem, ElementType& max_elem)
     {
         min_elem = points_[ind[0]][dim];
         max_elem = points_[ind[0]][dim];
-        for (int i=1; i<count; ++i) {
+        for (size_t i=1; i<count; ++i) {
             ElementType val = points_[ind[i]][dim];
             if (val<min_elem) min_elem = val;
             if (val>max_elem) max_elem = val;
         }
     }
 
-    void middleSplit(int* ind, int count, int& index, int& cutfeat, DistanceType& cutval, const BoundingBox& bbox)
+    void middleSplit(size_t* ind, size_t count, size_t& index, size_t& cutfeat, DistanceType& cutval, const BoundingBox& bbox)
     {
         // find the largest span from the approximate bounding box
-        ElementType max_span = bbox[0].high-bbox[0].low;
+        ElementType max_span = ElementType(bbox[0].high-bbox[0].low);
         cutfeat = 0;
         cutval = (bbox[0].high+bbox[0].low)/2;
         for (size_t i=1; i<veclen_; ++i) {
-            ElementType span = bbox[i].high-bbox[i].low;
+            ElementType span = ElementType(bbox[i].high-bbox[i].low);
             if (span>max_span) {
                 max_span = span;
                 cutfeat = i;
@@ -464,25 +464,25 @@ private:
         // compute exact span on the found dimension
         ElementType min_elem, max_elem;
         computeMinMax(ind, count, cutfeat, min_elem, max_elem);
-        cutval = (min_elem+max_elem)/2;
+        cutval = DistanceType((min_elem+max_elem)/2);
         max_span = max_elem - min_elem;
 
         // check if a dimension of a largest span exists
         size_t k = cutfeat;
         for (size_t i=0; i<veclen_; ++i) {
             if (i==k) continue;
-            ElementType span = bbox[i].high-bbox[i].low;
+            ElementType span = ElementType(bbox[i].high-bbox[i].low);
             if (span>max_span) {
                 computeMinMax(ind, count, i, min_elem, max_elem);
                 span = max_elem - min_elem;
                 if (span>max_span) {
                     max_span = span;
                     cutfeat = i;
-                    cutval = (min_elem+max_elem)/2;
+                    cutval = DistanceType((min_elem+max_elem)/2);
                 }
             }
         }
-        int lim1, lim2;
+        size_t lim1, lim2;
         planeSplit(ind, count, cutfeat, cutval, lim1, lim2);
 
         if (lim1>count/2) index = lim1;
@@ -546,10 +546,10 @@ private:
      *  dataset[ind[lim1..lim2-1]][cutfeat]==cutval
      *  dataset[ind[lim2..count]][cutfeat]>cutval
      */
-    void planeSplit(int* ind, int count, int cutfeat, DistanceType cutval, int& lim1, int& lim2)
+    void planeSplit(size_t* ind, size_t count, size_t cutfeat, DistanceType cutval, size_t& lim1, size_t& lim2)
     {
-        int left = 0;
-        int right = count-1;
+        size_t left = 0;
+        size_t right = count-1;
         for (;; ) {
             while (left<=right && points_[ind[left]][cutfeat]<cutval) ++left;
             while (left<=right && points_[ind[right]][cutfeat]>=cutval) --right;
@@ -596,7 +596,7 @@ private:
         /* If this is a leaf node, then do check and return. */
         if ((node->child1 == NULL)&&(node->child2 == NULL)) {
             DistanceType worst_dist = result_set.worstDist();
-            for (int i=node->left; i<node->right; ++i) {
+            for (size_t i=node->left; i<node->right; ++i) {
                 if (with_removed) {
                     if (removed_points_.test(vind_[i])) continue;
                 }
@@ -610,7 +610,7 @@ private:
         }
 
         /* Which child branch should be taken first? */
-        int idx = node->divfeat;
+        size_t idx = node->divfeat;
         ElementType val = vec[idx];
         DistanceType diff1 = val - node->divlow;
         DistanceType diff2 = val - node->divhigh;
@@ -666,7 +666,7 @@ private:
     /**
      *  Array of indices to vectors in the dataset.
      */
-    std::vector<int> vind_;
+    std::vector<size_t> vind_;
 
     Matrix<ElementType> data_;
 

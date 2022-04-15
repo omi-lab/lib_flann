@@ -205,7 +205,7 @@ public:
      * Computes the inde memory usage
      * Returns: memory used by the index
      */
-    int usedMemory() const
+    size_t usedMemory() const
     {
         return pool_.usedMemory+pool_.wastedMemory+memoryCounter_;
     }
@@ -298,9 +298,9 @@ public:
      *     numClusters = number of clusters to have in the clustering computed
      * Returns: number of cluster centers
      */
-    int getClusterCenters(Matrix<DistanceType>& centers)
+    size_t getClusterCenters(Matrix<DistanceType>& centers)
     {
-        int numClusters = centers.rows;
+        size_t numClusters = centers.rows;
         if (numClusters<1) {
             throw FLANNException("Number of clusters must be at least 1");
         }
@@ -308,11 +308,11 @@ public:
         DistanceType variance;
         std::vector<NodePtr> clusters(numClusters);
 
-        int clusterCount = getMinVarianceClusters(root_, clusters, numClusters, variance);
+        size_t clusterCount = getMinVarianceClusters(root_, clusters, numClusters, variance);
 
         Logger::info("Clusters requested: %d, returning %d\n",numClusters, clusterCount);
 
-        for (int i=0; i<clusterCount; ++i) {
+        for (size_t i=0; i<clusterCount; ++i) {
             DistanceType* center = clusters[i]->pivot;
             for (size_t j=0; j<veclen_; ++j) {
                 centers[i][j] = center[j];
@@ -334,14 +334,14 @@ protected:
             throw FLANNException("Branching factor must be at least 2");
         }
 
-        std::vector<int> indices(size_);
+        std::vector<size_t> indices(size_);
         for (size_t i=0; i<size_; ++i) {
         	indices[i] = int(i);
         }
 
         root_ = new(pool_) Node();
         computeNodeStatistics(root_, indices);
-        computeClustering(root_, &indices[0], (int)size_, branching_);
+        computeClustering(root_, &indices[0], size_, branching_);
     }
 
 private:
@@ -385,7 +385,7 @@ private:
         /**
          * The cluster size (number of points in the cluster)
          */
-        int size;
+        size_t size;
         /**
          * Child nodes (only for non-terminal nodes)
          */
@@ -493,7 +493,7 @@ private:
      *     node = the node to use
      *     indices = the indices of the points belonging to the node
      */
-    void computeNodeStatistics(NodePtr node, const std::vector<int>& indices)
+    void computeNodeStatistics(NodePtr node, const std::vector<size_t>& indices)
     {
         size_t size = indices.size();
 
@@ -541,13 +541,13 @@ private:
      *
      * TODO: for 1-sized clusters don't store a cluster center (it's the same as the single cluster point)
      */
-    void computeClustering(NodePtr node, int* indices, int indices_length, int branching)
+    void computeClustering(NodePtr node, size_t* indices, size_t indices_length, size_t branching)
     {
         node->size = indices_length;
 
         if (indices_length < branching) {
             node->points.resize(indices_length);
-            for (int i=0;i<indices_length;++i) {
+            for (size_t i=0;i<indices_length;++i) {
             	node->points[i].index = indices[i];
             	node->points[i].point = points_[indices[i]];
             }
@@ -555,13 +555,13 @@ private:
             return;
         }
 
-        std::vector<int> centers_idx(branching);
-        int centers_length;
+        std::vector<size_t> centers_idx(branching);
+        size_t centers_length;
         (*chooseCenters_)(branching, indices, indices_length, &centers_idx[0], centers_length);
 
         if (centers_length<branching) {
             node->points.resize(indices_length);
-            for (int i=0;i<indices_length;++i) {
+            for (size_t i=0;i<indices_length;++i) {
             	node->points[i].index = indices[i];
             	node->points[i].point = points_[indices[i]];
             }
@@ -571,7 +571,7 @@ private:
 
 
         Matrix<double> dcenters(new double[branching*veclen_],branching,veclen_);
-        for (int i=0; i<centers_length; ++i) {
+        for (size_t i=0; i<centers_length; ++i) {
             ElementType* vec = points_[centers_idx[i]];
             for (size_t k=0; k<veclen_; ++k) {
                 dcenters[i][k] = double(vec[k]);
@@ -778,7 +778,7 @@ private:
             }
             for (int i=0; i<node->size; ++i) {
             	PointInfo& point_info = node->points[i];
-                int index = point_info.index;
+                size_t index = point_info.index;
                 if (with_removed) {
                 	if (removed_points_.test(index)) continue;
                 }
@@ -854,7 +854,7 @@ private:
         if (node->childs.empty()) {
             for (int i=0; i<node->size; ++i) {
             	PointInfo& point_info = node->points[i];
-                int index = point_info.index;
+                size_t index = point_info.index;
                 if (with_removed) {
                 	if (removed_points_.test(index)) continue;
                 }
@@ -925,9 +925,9 @@ private:
      *     varianceValue = variance of the clustering (return value)
      * Returns:
      */
-    int getMinVarianceClusters(NodePtr root, std::vector<NodePtr>& clusters, int clusters_length, DistanceType& varianceValue) const
+    size_t getMinVarianceClusters(NodePtr root, std::vector<NodePtr>& clusters, size_t clusters_length, DistanceType& varianceValue) const
     {
-        int clusterCount = 1;
+        size_t clusterCount = 1;
         clusters[0] = root;
 
         DistanceType meanVariance = root->variance*root->size;
@@ -984,7 +984,7 @@ private:
         	point_info.point = point;
         	node->points.push_back(point_info);
 
-            std::vector<int> indices(node->points.size());
+            std::vector<size_t> indices(node->points.size());
             for (size_t i=0;i<node->points.size();++i) {
             	indices[i] = node->points[i].index;
             }
@@ -995,7 +995,7 @@ private:
         }
         else {            
             // find the closest child
-            int closest = 0;
+            size_t closest = 0;
             DistanceType dist = distance_(node->childs[closest]->pivot, point, veclen_);
             for (size_t i=1;i<size_t(branching_);++i) {
                 DistanceType crt_dist = distance_(node->childs[i]->pivot, point, veclen_);
@@ -1053,7 +1053,7 @@ private:
     /**
      * Memory occupied by the index.
      */
-    int memoryCounter_;
+    size_t memoryCounter_;
 
     /**
      * Algorithm used to choose initial centers

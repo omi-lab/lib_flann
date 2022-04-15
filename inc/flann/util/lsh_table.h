@@ -62,10 +62,10 @@ namespace lsh
 
 /** What is stored in an LSH bucket
  */
-typedef uint32_t FeatureIndex;
+typedef size_t FeatureIndex;
 /** The id from which we can get a bucket back in an LSH table
  */
-typedef unsigned int BucketKey;
+typedef size_t BucketKey;
 
 /** A bucket in an LSH table
  */
@@ -77,7 +77,7 @@ typedef std::vector<FeatureIndex> Bucket;
  */
 struct LshStats
 {
-    std::vector<unsigned int> bucket_sizes_;
+    std::vector<size_t> bucket_sizes_;
     size_t n_buckets_;
     size_t bucket_size_mean_;
     size_t bucket_size_median_;
@@ -86,7 +86,7 @@ struct LshStats
     size_t bucket_size_std_dev;
     /** Each contained vector contains three value: beginning/end for interval, number of elements in the bin
      */
-    std::vector<std::vector<unsigned int> > size_histogram_;
+    std::vector<std::vector<size_t> > size_histogram_;
 };
 
 /** Overload the << operator for LshStats
@@ -108,7 +108,7 @@ inline std::ostream& operator <<(std::ostream& out, const LshStats& stats)
     // Display the histogram
     out << std::endl << std::setw(w) << std::setiosflags(std::ios::right) << "histogram : "
     << std::setiosflags(std::ios::left);
-    for (std::vector<std::vector<unsigned int> >::const_iterator iterator = stats.size_histogram_.begin(), end =
+    for (std::vector<std::vector<size_t> >::const_iterator iterator = stats.size_histogram_.begin(), end =
              stats.size_histogram_.end(); iterator != end; ++iterator) out << (*iterator)[0] << "-" << (*iterator)[1] << ": " << (*iterator)[2] << ",  ";
 
     return out;
@@ -149,7 +149,7 @@ public:
      * @param feature_size is the size of the feature (considered as a ElementType[])
      * @param key_size is the number of bits that are turned on in the feature
      */
-    LshTable(unsigned int /*feature_size*/, unsigned int /*key_size*/)
+    LshTable(size_t /*feature_size*/, size_t /*key_size*/)
     {
         std::cerr << "LSH is not implemented for that type" << std::endl;
         throw;
@@ -159,7 +159,7 @@ public:
      * @param value the value to store for that feature
      * @param feature the feature itself
      */
-    void add(unsigned int value, const ElementType* feature)
+    void add(size_t value, const ElementType* feature)
     {
         // Add the value to the corresponding bucket
         BucketKey key = getKey(feature);
@@ -342,7 +342,7 @@ private:
 
     /** The size of the sub-signature in bits
      */
-    unsigned int key_size_;
+    size_t key_size_;
 
     // Members only used for the unsigned char specialization
     /** The mask to apply to a feature to get the hash key
@@ -355,7 +355,7 @@ private:
 // Specialization for unsigned char
 
 template<>
-inline LshTable<unsigned char>::LshTable(unsigned int feature_size, unsigned int subsignature_size)
+inline LshTable<unsigned char>::LshTable(size_t feature_size, size_t subsignature_size)
 {
     initialize(subsignature_size);
     // Allocate the mask
@@ -369,7 +369,7 @@ inline LshTable<unsigned char>::LshTable(unsigned int feature_size, unsigned int
     std::shuffle(indices.begin(), indices.end(),g);
 
     // Generate a random set of order of subsignature_size_ bits
-    for (unsigned int i = 0; i < key_size_; ++i) {
+    for (size_t i = 0; i < key_size_; ++i) {
         size_t index = indices[i];
 
         // Set that bit in the mask
@@ -475,14 +475,14 @@ inline LshStats LshTable<unsigned char>::getStats() const
        stats.bucket_size_std_dev = stddev;*/
 
     // Include a histogram of the buckets
-    unsigned int bin_start = 0;
-    unsigned int bin_end = 20;
+    size_t bin_start = 0;
+    size_t bin_end = 20;
     bool is_new_bin = true;
-    for (std::vector<unsigned int>::iterator iterator = stats.bucket_sizes_.begin(), end = stats.bucket_sizes_.end(); iterator
+    for (std::vector<size_t>::iterator iterator = stats.bucket_sizes_.begin(), end = stats.bucket_sizes_.end(); iterator
          != end; )
         if (*iterator < bin_end) {
             if (is_new_bin) {
-                stats.size_histogram_.push_back(std::vector<unsigned int>(3, 0));
+                stats.size_histogram_.push_back(std::vector<size_t>(3, 0));
                 stats.size_histogram_.back()[0] = bin_start;
                 stats.size_histogram_.back()[1] = bin_end - 1;
                 is_new_bin = false;

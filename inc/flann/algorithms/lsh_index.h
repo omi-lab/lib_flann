@@ -56,7 +56,7 @@ namespace flann
 
 struct LshIndexParams : public IndexParams
 {
-    LshIndexParams(unsigned int table_number = 12, unsigned int key_size = 20, unsigned int multi_probe_level = 2)
+    LshIndexParams(size_t table_number = 12, size_t key_size = 20, size_t multi_probe_level = 2)
     {
         (* this)["algorithm"] = FLANN_INDEX_LSH;
         // The number of hash tables to use
@@ -90,9 +90,9 @@ public:
     LshIndex(const IndexParams& params = LshIndexParams(), Distance d = Distance()) :
     	BaseClass(params, d)
     {
-        table_number_ = get_param<unsigned int>(index_params_,"table_number",12);
-        key_size_ = get_param<unsigned int>(index_params_,"key_size",20);
-        multi_probe_level_ = get_param<unsigned int>(index_params_,"multi_probe_level",2);
+        table_number_ = get_param<size_t>(index_params_,"table_number",12);
+        key_size_ = get_param<size_t>(index_params_,"key_size",20);
+        multi_probe_level_ = get_param<size_t>(index_params_,"multi_probe_level",2);
 
         fill_xor_mask(0, key_size_, multi_probe_level_, xor_masks_);
     }
@@ -106,9 +106,9 @@ public:
     LshIndex(const Matrix<ElementType>& input_data, const IndexParams& params = LshIndexParams(), Distance d = Distance()) :
     	BaseClass(params, d)
     {
-        table_number_ = get_param<unsigned int>(index_params_,"table_number",12);
-        key_size_ = get_param<unsigned int>(index_params_,"key_size",20);
-        multi_probe_level_ = get_param<unsigned int>(index_params_,"multi_probe_level",2);
+        table_number_ = get_param<size_t>(index_params_,"table_number",12);
+        key_size_ = get_param<size_t>(index_params_,"key_size",20);
+        multi_probe_level_ = get_param<size_t>(index_params_,"multi_probe_level",2);
 
         fill_xor_mask(0, key_size_, multi_probe_level_, xor_masks_);
 
@@ -154,7 +154,7 @@ public:
             buildIndex();
         }
         else {
-            for (unsigned int i = 0; i < table_number_; ++i) {
+            for (size_t i = 0; i < table_number_; ++i) {
                 lsh::LshTable<ElementType>& table = tables_[i];                
                 for (size_t i=old_size;i<size_;++i) {
                     table.add(i, points_[i]);
@@ -208,7 +208,7 @@ public:
      * Computes the index memory usage
      * Returns: memory used by the index
      */
-    int usedMemory() const
+    size_t usedMemory() const
     {
         return size_ * sizeof(int);
     }
@@ -237,22 +237,22 @@ public:
         if (params.use_heap==FLANN_True) {
 #pragma omp parallel num_threads(params.cores)
         	{
-        		KNNUniqueResultSet<DistanceType> resultSet(knn);
+            KNNUniqueResultSet<DistanceType> resultSet(knn);
 #pragma omp for schedule(static) reduction(+:count)
-        		for (int i = 0; i < (int)queries.rows; i++) {
+            for (int i = 0; i < int(queries.rows); i++) {
         			resultSet.clear();
         			findNeighbors(resultSet, queries[i], params);
         			size_t n = std::min(resultSet.size(), knn);
-        			resultSet.copy(indices[i], dists[i], n, params.sorted);
+              resultSet.copy(indices[i], dists[i], int(n), params.sorted);
         			indices_to_ids(indices[i], indices[i], n);
-        			count += n;
+              count += int(n);
         		}
         	}
         }
         else {
 #pragma omp parallel num_threads(params.cores)
         	{
-        		KNNResultSet<DistanceType> resultSet(knn);
+            KNNResultSet<DistanceType> resultSet(knn);
 #pragma omp for schedule(static) reduction(+:count)
         		for (int i = 0; i < (int)queries.rows; i++) {
         			resultSet.clear();
@@ -260,7 +260,7 @@ public:
         			size_t n = std::min(resultSet.size(), knn);
         			resultSet.copy(indices[i], dists[i], n, params.sorted);
         			indices_to_ids(indices[i], indices[i], n);
-        			count += n;
+              count += int(n);
         		}
         	}
         }
@@ -356,7 +356,7 @@ protected:
         for (size_t i=0;i<points_.size();++i) {
         	features.push_back(std::make_pair(i, points_[i]));
         }
-        for (unsigned int i = 0; i < table_number_; ++i) {
+        for (size_t i = 0; i < table_number_; ++i) {
             lsh::LshTable<ElementType>& table = tables_[i];
             table = lsh::LshTable<ElementType>(veclen_, key_size_);
 
@@ -374,7 +374,7 @@ protected:
 private:
     /** Defines the comparator on score and index
      */
-    typedef std::pair<float, unsigned int> ScoreIndexPair;
+    typedef std::pair<float, size_t> ScoreIndexPair;
     struct SortScoreIndexPairOnSecond
     {
         bool operator()(const ScoreIndexPair& left, const ScoreIndexPair& right) const
@@ -389,12 +389,12 @@ private:
      * @param level the multi-probe level we are at
      * @param xor_masks all the xor mask
      */
-    void fill_xor_mask(lsh::BucketKey key, int lowest_index, unsigned int level,
+    void fill_xor_mask(lsh::BucketKey key, size_t lowest_index, size_t level,
                        std::vector<lsh::BucketKey>& xor_masks)
     {
         xor_masks.push_back(key);
         if (level == 0) return;
-        for (int index = lowest_index - 1; index >= 0; --index) {
+        for (size_t index = lowest_index - 1; index<lowest_index; --index) {
             // Create a new key
             lsh::BucketKey new_key = key | (lsh::BucketKey(1) << index);
             fill_xor_mask(new_key, index, level - 1, xor_masks);
@@ -409,13 +409,13 @@ private:
      * @param k_nn the number of nearest neighbors
      * @param checked_average used for debugging
      */
-    void getNeighbors(const ElementType* vec, bool do_radius, float radius, bool do_k, unsigned int k_nn,
+    void getNeighbors(const ElementType* vec, bool do_radius, float radius, bool do_k, size_t k_nn,
                       float& checked_average)
     {
         static std::vector<ScoreIndexPair> score_index_heap;
 
         if (do_k) {
-            unsigned int worst_score = std::numeric_limits<unsigned int>::max();
+            size_t worst_score = std::numeric_limits<size_t>::max();
             typename std::vector<lsh::LshTable<ElementType> >::const_iterator table = tables_.begin();
             typename std::vector<lsh::LshTable<ElementType> >::const_iterator table_end = tables_.end();
             for (; table != table_end; ++table) {
@@ -442,7 +442,7 @@ private:
                             score_index_heap.push_back(ScoreIndexPair(hamming_distance, training_index));
                             std::push_heap(score_index_heap.begin(), score_index_heap.end());
 
-                            if (score_index_heap.size() > (unsigned int)k_nn) {
+                            if (score_index_heap.size() > k_nn) {
                                 // Remove the highest distance value as we have too many elements
                                 std::pop_heap(score_index_heap.begin(), score_index_heap.end());
                                 score_index_heap.pop_back();
@@ -532,11 +532,11 @@ private:
     std::vector<lsh::LshTable<ElementType> > tables_;
     
     /** table number */
-    unsigned int table_number_;
+    size_t table_number_;
     /** key size */
-    unsigned int key_size_;
+    size_t key_size_;
     /** How far should we look for neighbors in multi-probe LSH */
-    unsigned int multi_probe_level_;
+    size_t multi_probe_level_;
 
     /** The XOR masks to apply to a key to get the neighboring buckets */
     std::vector<lsh::BucketKey> xor_masks_;

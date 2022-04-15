@@ -153,7 +153,7 @@ public:
         else {
             for (size_t i=old_size;i<size_;++i) {
                 for (int j = 0; j < trees_; j++) {
-                    addPointToTree(tree_roots_[j], i);
+                    addPointToTree(tree_roots_[j], int(i));
                 }
             }
         }        
@@ -209,9 +209,9 @@ public:
      * Computes the inde memory usage
      * Returns: memory used by the index
      */
-    int usedMemory() const
+    size_t usedMemory() const
     {
-        return int(pool_.usedMemory+pool_.wastedMemory+size_*sizeof(int));  // pool memory and vind array memory
+        return pool_.usedMemory+pool_.wastedMemory+size_*sizeof(int);  // pool memory and vind array memory
     }
 
     /**
@@ -293,7 +293,7 @@ private:
     	/**
          * Dimension used for subdivision.
          */
-        int divfeat;
+        size_t divfeat;
         /**
          * The values used for subdivision.
          */
@@ -462,7 +462,7 @@ private:
      */
     int selectDivision(DistanceType* v)
     {
-        int num = 0;
+        size_t num = 0;
         size_t topind[RAND_DIM];
 
         /* Create a list of the indices of the top RAND_DIM values. */
@@ -476,7 +476,7 @@ private:
                     topind[num-1] = i;         /* Replace last element. */
                 }
                 /* Bubble end value down to right location by repeated swapping. */
-                int j = num - 1;
+                size_t j = num - 1;
                 while (j > 0  &&  v[topind[j]] > v[topind[j-1]]) {
                     std::swap(topind[j], topind[j-1]);
                     --j;
@@ -484,7 +484,7 @@ private:
             }
         }
         /* Select a random integer in range [0,num-1], and return that index. */
-        int rnd = rand_int(num);
+        size_t rnd = rand_int(num);
         return int(topind[rnd]);
     }
 
@@ -582,7 +582,7 @@ private:
 
         /* If this is a leaf node, then do check and return. */
         if ((node->child1 == NULL)&&(node->child2 == NULL)) {
-            int index = node->divfeat;
+            size_t index = node->divfeat;
             if (with_removed) {
             	if (removed_points_.test(index)) return;
             }
@@ -628,7 +628,7 @@ private:
     {
         /* If this is a leaf node, then do check and return. */
         if ((node->child1 == NULL)&&(node->child2 == NULL)) {
-            int index = node->divfeat;
+            size_t index = node->divfeat;
             if (with_removed) {
             	if (removed_points_.test(index)) return; // ignore removed points
             }
@@ -695,7 +695,7 @@ private:
                 right->point = point;
             }
             node->divfeat = div_feat;
-            node->divval = (point[div_feat]+leaf_point[div_feat])/2;
+            node->divval = float((point[div_feat]+leaf_point[div_feat])/2);
             node->child1 = left;
             node->child2 = right;            
         }

@@ -46,10 +46,10 @@ Matrix<T> random_sample(Matrix<T>& srcMatrix, size_t size, bool remove = false)
     for (size_t i=0; i<size; ++i) {
     	size_t r;
     	if (remove) {
-            r = static_cast<size_t>(rand_int(srcMatrix.rows-i));
+            r = rand_int(srcMatrix.rows-i);
     	}
     	else {
-    		r = static_cast<size_t>(rand_unique.next());
+        r = size_t(rand_unique.next());
     	}
         dest = newSet[i];
         src = srcMatrix[r];

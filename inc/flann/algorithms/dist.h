@@ -91,7 +91,7 @@ struct L2_Simple
     }
 
     template <typename U, typename V>
-    inline ResultType accum_dist(const U& a, const V& b, int) const
+    inline ResultType accum_dist(const U& a, const V& b, size_t) const
     {
         return (a-b)*(a-b);
     }
@@ -120,7 +120,7 @@ struct L2_3D
     }
 
     template <typename U, typename V>
-    inline ResultType accum_dist(const U& a, const V& b, int) const
+    inline ResultType accum_dist(const U& a, const V& b, size_t) const
     {
         return (a-b)*(a-b);
     }
@@ -183,7 +183,7 @@ struct L2
      *	Squared root is omitted for efficiency.
      */
     template <typename U, typename V>
-    inline ResultType accum_dist(const U& a, const V& b, int) const
+    inline ResultType accum_dist(const U& a, const V& b, size_t) const
     {
         return (a-b)*(a-b);
     }
@@ -241,7 +241,7 @@ struct L1
      * Partial distance, used by the kd-tree.
      */
     template <typename U, typename V>
-    inline ResultType accum_dist(const U& a, const V& b, int) const
+    inline ResultType accum_dist(const U& a, const V& b, size_t) const
     {
         return std::abs(a-b);
     }
@@ -284,7 +284,7 @@ struct MinkowskiDistance
             diff1 = (ResultType)std::abs(a[1] - b[1]);
             diff2 = (ResultType)std::abs(a[2] - b[2]);
             diff3 = (ResultType)std::abs(a[3] - b[3]);
-            result += pow(diff0,order) + pow(diff1,order) + pow(diff2,order) + pow(diff3,order);
+            result += ResultType(std::pow(diff0,order) + std::pow(diff1,order) + std::pow(diff2,order) + std::pow(diff3,order));
             a += 4;
             b += 4;
 
@@ -295,7 +295,7 @@ struct MinkowskiDistance
         /* Process last 0-3 pixels.  Not needed for standard vector lengths. */
         while (a < last) {
             diff0 = (ResultType)std::abs(*a++ - *b++);
-            result += pow(diff0,order);
+            result += ResultType(std::pow(diff0,order));
         }
         return result;
     }
@@ -304,9 +304,9 @@ struct MinkowskiDistance
      * Partial distance, used by the kd-tree.
      */
     template <typename U, typename V>
-    inline ResultType accum_dist(const U& a, const V& b, int) const
+    inline ResultType accum_dist(const U& a, const V& b, size_t) const
     {
-        return pow(static_cast<ResultType>(std::abs(a-b)),order);
+        return ResultType(std::pow(ResultType(std::abs(a-b)),order));
     }
 };
 
@@ -519,7 +519,7 @@ struct HammingPopcnt
 #else
         HammingLUT lut;
         result = lut(reinterpret_cast<const unsigned char*> (a),
-                     reinterpret_cast<const unsigned char*> (b), size * sizeof(pop_t));
+                     reinterpret_cast<const unsigned char*> (b), size * sizeof(size_t));
 #endif
         return result;
     }
@@ -625,7 +625,7 @@ struct HistIntersectionDistance
      * Partial distance, used by the kd-tree.
      */
     template <typename U, typename V>
-    inline ResultType accum_dist(const U& a, const V& b, int) const
+    inline ResultType accum_dist(const U& a, const V& b, size_t) const
     {
         return a<b ? a : b;
     }
@@ -673,7 +673,7 @@ struct HellingerDistance
      * Partial distance, used by the kd-tree.
      */
     template <typename U, typename V>
-    inline ResultType accum_dist(const U& a, const V& b, int) const
+    inline ResultType accum_dist(const U& a, const V& b, size_t) const
     {
         ResultType dist = sqrt(static_cast<ResultType>(a)) - sqrt(static_cast<ResultType>(b));
         return dist * dist;
@@ -719,7 +719,7 @@ struct ChiSquareDistance
      * Partial distance, used by the kd-tree.
      */
     template <typename U, typename V>
-    inline ResultType accum_dist(const U& a, const V& b, int) const
+    inline ResultType accum_dist(const U& a, const V& b, size_t) const
     {
         ResultType result = ResultType();
         ResultType sum, diff;
@@ -772,7 +772,7 @@ struct KL_Divergence
      * Partial distance, used by the kd-tree.
      */
     template <typename U, typename V>
-    inline ResultType accum_dist(const U& a, const V& b, int) const
+    inline ResultType accum_dist(const U& a, const V& b, size_t) const
     {
         ResultType result = ResultType();
         if( a != 0 && b != 0 ) {

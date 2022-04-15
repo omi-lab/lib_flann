@@ -177,7 +177,7 @@ public:
      * @param num_elements Number of elements to copy
      * @param sorted Indicates if results should be sorted
      */
-    void copy(size_t* indices, DistanceType* dists, size_t num_elements, bool sorted = true)
+    void copy(size_t* indices, DistanceType* dists, size_t num_elements, bool /*sorted = true*/)
     {
     	size_t n = std::min(count_, num_elements);
     	for (size_t i=0; i<n; ++i) {
@@ -207,7 +207,7 @@ class KNNResultSet : public ResultSet<DistanceType>
 public:
 	typedef DistanceIndex<DistanceType> DistIndex;
 
-    KNNResultSet(int capacity) : capacity_(capacity)
+    KNNResultSet(size_t capacity) : capacity_(capacity)
     {
 		// reserving capacity to prevent memory re-allocations
 		dist_index_.resize(capacity_, DistIndex(std::numeric_limits<DistanceType>::max(),-1));
@@ -276,7 +276,7 @@ public:
      * @param num_elements Number of elements to copy
      * @param sorted Indicates if results should be sorted
      */
-    void copy(size_t* indices, DistanceType* dists, size_t num_elements, bool sorted = true)
+    void copy(size_t* indices, DistanceType* dists, size_t num_elements, bool /*sorted = true*/)
     {
     	size_t n = std::min(count_, num_elements);
     	for (size_t i=0; i<n; ++i) {
@@ -680,7 +680,7 @@ public:
         return true;
     }
 
-    void addPoint(DistanceType dist, size_t index)
+    void addPoint(DistanceType dist, size_t /*index*/)
     {
         if (dist<radius) {
             count++;
@@ -706,7 +706,7 @@ class UniqueResultSet : public ResultSet<DistanceType>
 public:
     struct DistIndex
     {
-        DistIndex(DistanceType dist, unsigned int index) :
+        DistIndex(DistanceType dist, size_t index) :
             dist_(dist), index_(index)
         {
         }
@@ -715,7 +715,7 @@ public:
             return (dist_ < dist_index.dist_) || ((dist_ == dist_index.dist_) && index_ < dist_index.index_);
         }
         DistanceType dist_;
-        unsigned int index_;
+        size_t index_;
     };
 
     /** Default cosntructor */
@@ -737,9 +737,9 @@ public:
      * @param dist pointer to a C array of distances
      * @param n_neighbors the number of neighbors to copy
      */
-    void copy(size_t* indices, DistanceType* dist, int n_neighbors, bool sorted = true)
+    void copy(size_t* indices, DistanceType* dist, int n_neighbors, bool /*sorted*/ = true)
     {
-    	if (n_neighbors<0) n_neighbors = dist_indices_.size();
+      if (n_neighbors<0) n_neighbors = int(dist_indices_.size());
     	int i = 0;
     	typedef typename std::set<DistIndex>::const_iterator Iterator;
     	for (Iterator dist_index = dist_indices_.begin(), dist_index_end =
@@ -788,7 +788,7 @@ public:
     /** Constructor
      * @param capacity the number of neighbors to store at max
      */
-    KNNUniqueResultSet(unsigned int capacity) : capacity_(capacity)
+    KNNUniqueResultSet(size_t capacity) : capacity_(capacity)
     {
         this->is_full_ = false;
         this->clear();
@@ -832,7 +832,7 @@ protected:
     using UniqueResultSet<DistanceType>::dist_indices_;
 
     /** The number of neighbors to keep */
-    unsigned int capacity_;
+    size_t capacity_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

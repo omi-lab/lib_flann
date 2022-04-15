@@ -57,7 +57,7 @@ public:
 
     virtual flann_algorithm_t getType() const = 0;
 
-    virtual int usedMemory() const = 0;
+    virtual size_t usedMemory() const = 0;
 
     virtual IndexParams getParameters() const = 0;
 
@@ -149,7 +149,7 @@ public:
 	 * @param points Matrix with points to be added
 	 * @param rebuild_threshold
 	 */
-    virtual void addPoints(const Matrix<ElementType>& points, float rebuild_threshold = 2)
+    virtual void addPoints(const Matrix<ElementType>& /*points*/, float /*rebuild_threshold = 2*/)
     {
         throw FLANNException("Functionality not supported by this index");
     }
@@ -334,7 +334,7 @@ public:
     				size_t n = std::min(resultSet.size(), knn);
     				resultSet.copy(indices[i], dists[i], n, params.sorted);
     				indices_to_ids(indices[i], indices[i], n);
-    				count += n;
+            count += int(n);
     			}
     		}
     	}
@@ -349,7 +349,7 @@ public:
     				size_t n = std::min(resultSet.size(), knn);
     				resultSet.copy(indices[i], dists[i], n, params.sorted);
     				indices_to_ids(indices[i], indices[i], n);
-    				count += n;
+            count += int(n);
     			}
     		}
     	}
@@ -376,7 +376,7 @@ public:
 
     	for (size_t i=0;i<indices.rows;++i) {
     		for (size_t j=0;j<indices.cols;++j) {
-    			indices[i][j] = indices_[i][j];
+          indices[i][j] = int(indices_[i][j]);
     		}
     	}
         delete[] indices_.ptr();
@@ -498,8 +498,8 @@ public:
     	int count = 0;
     	size_t num_neighbors = std::min(indices.cols, dists.cols);
     	int max_neighbors = params.max_neighbors;
-    	if (max_neighbors<0) max_neighbors = num_neighbors;
-    	else max_neighbors = std::min(max_neighbors,(int)num_neighbors);
+      if (max_neighbors<0) max_neighbors = int(num_neighbors);
+      else max_neighbors = std::min(max_neighbors,int(num_neighbors));
 
     	if (max_neighbors==0) {
 #pragma omp parallel num_threads(params.cores)
@@ -509,7 +509,7 @@ public:
     			for (int i = 0; i < (int)queries.rows; i++) {
     				resultSet.clear();
     				findNeighbors(resultSet, queries[i], params);
-    				count += resultSet.size();
+            count += int(resultSet.size());
     			}
     		}
     	}
@@ -525,7 +525,7 @@ public:
     					resultSet.clear();
     					findNeighbors(resultSet, queries[i], params);
     					size_t n = resultSet.size();
-    					count += n;
+              count += int(n);
     					if (n>num_neighbors) n = num_neighbors;
     					resultSet.copy(indices[i], dists[i], n, params.sorted);
 
@@ -542,12 +542,12 @@ public:
     			{
     				KNNRadiusResultSet<DistanceType> resultSet(radius, max_neighbors);
 #pragma omp for schedule(static) reduction(+:count)
-    				for (int i = 0; i < (int)queries.rows; i++) {
+            for (int i = 0; i < int(queries.rows); i++) {
     					resultSet.clear();
     					findNeighbors(resultSet, queries[i], params);
     					size_t n = resultSet.size();
-    					count += n;
-    					if ((int)n>max_neighbors) n = max_neighbors;
+              count += int(n);
+              if (int(n)>max_neighbors) n = max_neighbors;
     					resultSet.copy(indices[i], dists[i], n, params.sorted);
 
     					// mark the next element in the output buffers as unused
@@ -582,7 +582,7 @@ public:
 
     	for (size_t i=0;i<indices.rows;++i) {
     		for (size_t j=0;j<indices.cols;++j) {
-    			indices[i][j] = indices_[i][j];
+          indices[i][j] = int(indices_[i][j]);
     		}
     	}
         delete[] indices_.ptr();
