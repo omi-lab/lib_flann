@@ -5,7 +5,7 @@ DEFINES += LIB_FLANN
 DEFINES += FLANN_EXPORTS
 
 SOURCES += src/flann.cpp
-SOURCES += src/flann_cpp.cpp
+#SOURCES += src/flann_cpp.cpp
 
 HEADERS += inc/flann/config.h
 HEADERS += inc/flann/defines.h
