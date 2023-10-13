@@ -539,7 +539,6 @@ private:
      *     indices = indices of the points belonging to the current node
      *     branching = the branching factor to use in the clustering
      *
-     * TODO: for 1-sized clusters don't store a cluster center (it's the same as the single cluster point)
      */
     void computeClustering(NodePtr node, size_t* indices, size_t indices_length, size_t branching)
     {

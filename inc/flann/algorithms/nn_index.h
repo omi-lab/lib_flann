@@ -250,7 +250,6 @@ public:
 //            if (header.h.index_type != getType()) {
 //                throw FLANNException("Saved index type is different then the current index type.");
 //            }
-//            // TODO: check for distance type
 
 //    	}
 

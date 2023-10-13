@@ -174,7 +174,6 @@ public:
     /**
      * Computes the inde memory usage
      * Returns: memory used by the index
-     * TODO: return system or gpu RAM or both?
      */
     size_t usedMemory() const
     {
