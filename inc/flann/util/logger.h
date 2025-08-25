@@ -59,15 +59,17 @@ class Logger
 
     void _setDestination(const char* name)
     {
-        if (name==NULL) {
+      (void)name;
+        // if (name==NULL) {
             stream = stdout;
-        }
-        else {
-            stream = fopen(name,"w");
-            if (stream == NULL) {
-                stream = stdout;
-            }
-        }
+        // }
+        // else {
+
+        //     stream = fopen(name,"w");
+        //     if (stream == NULL) {
+        //         stream = stdout;
+        //     }
+        // }
     }
 
     int _log(int level, const char* fmt, va_list arglist)
